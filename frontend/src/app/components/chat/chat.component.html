@@ -1,0 +1,39 @@
+<div class="chat-container">
+  <div class="chat-header">
+    <h2>AI Fitness Coach</h2>
+    <button class="btn-secondary" (click)="clearHistory()">Clear History</button>
+  </div>
+
+  <div class="chat-messages">
+    <div *ngFor="let msg of messages" class="message-group">
+      <div class="message user-message">
+        <strong>You:</strong>
+        <p>{{ msg.message }}</p>
+      </div>
+      <div *ngIf="msg.response" class="message ai-message">
+        <strong>AI Coach:</strong>
+        <p>{{ msg.response }}</p>
+        <div class="message-meta" *ngIf="msg.intent || msg.sentiment">
+          <span *ngIf="msg.intent" class="badge">{{ msg.intent }}</span>
+          <span *ngIf="msg.sentiment" class="badge sentiment">{{ msg.sentiment }}</span>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="loading" class="message ai-message loading">
+      <p>AI Coach is thinking...</p>
+    </div>
+  </div>
+
+  <div class="chat-input">
+    <input 
+      type="text" 
+      [(ngModel)]="currentMessage" 
+      (keyup.enter)="sendMessage()"
+      placeholder="Ask your AI coach anything..."
+      [disabled]="loading"
+    />
+    <button class="btn-primary" (click)="sendMessage()" [disabled]="!currentMessage.trim() || loading">
+      Send
+    </button>
+  </div>
+</div>
