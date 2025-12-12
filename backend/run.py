@@ -37,4 +37,5 @@ if __name__ == '__main__':
 Press Ctrl+C to stop the server
     """)
     
-    app.run(host=host, port=port, debug=debug)
+    # Disable auto-reloader to prevent crashes
+    app.run(host=host, port=port, debug=debug, use_reloader=False)

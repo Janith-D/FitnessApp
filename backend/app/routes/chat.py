@@ -7,7 +7,7 @@ from datetime import datetime
 import json
 from app import db
 from app.models import User, ChatMessage
-from app.services.ai_service import ai_coach
+from app.services.ai_service_simple import ai_coach
 
 bp = Blueprint('chat', __name__)
 

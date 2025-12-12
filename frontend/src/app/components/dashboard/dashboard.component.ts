@@ -33,14 +33,26 @@ export class DashboardComponent implements OnInit {
       next: (response) => {
         this.user = response.user;
       },
-      error: (error) => console.error('Error loading profile:', error)
+      error: (error) => {
+        console.error('Error loading profile:', error);
+        if (error.status === 401 || error.status === 0) {
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        }
+      }
     });
 
     this.profileService.getStatistics().subscribe({
       next: (stats) => {
         this.statistics = stats;
       },
-      error: (error) => console.error('Error loading statistics:', error)
+      error: (error) => {
+        console.error('Error loading statistics:', error);
+        if (error.status === 401 || error.status === 0) {
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        }
+      }
     });
 
     this.workoutService.getWorkouts('completed', 5).subscribe({
@@ -51,6 +63,10 @@ export class DashboardComponent implements OnInit {
       error: (error) => {
         console.error('Error loading workouts:', error);
         this.loading = false;
+        if (error.status === 401 || error.status === 0) {
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        }
       }
     });
   }

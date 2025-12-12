@@ -43,7 +43,9 @@ def create_app(config=None):
         r"/*": {
             "origins": os.getenv('CORS_ORIGINS', 'http://localhost:3000').split(','),
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"]
+            "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True,
+            "expose_headers": ["Content-Type", "Authorization"]
         }
     })
     
