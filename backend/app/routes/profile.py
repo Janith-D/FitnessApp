@@ -3,14 +3,15 @@ Profile Routes
 """
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from datetime import datetime
+from datetime import datetime, timedelta
+from sqlalchemy import func
 from app import db
-from app.models import User, ProgressLog
+from app.models import User, ProgressLog, Workout
 
 bp = Blueprint('profile', __name__)
 
 
-@bp.route('/', methods=['GET'])
+@bp.route('/', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def get_profile():
     """Get user profile"""
@@ -27,7 +28,7 @@ def get_profile():
         return jsonify({'error': str(e)}), 500
 
 
-@bp.route('/', methods=['PUT'])
+@bp.route('/', methods=['PUT'], strict_slashes=False)
 @jwt_required()
 def update_profile():
     """Update user profile"""
@@ -119,4 +120,44 @@ def log_progress():
         
     except Exception as e:
         db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+@bp.route('/statistics', methods=['GET'])
+@jwt_required()
+def get_statistics():
+    """Get user statistics"""
+    try:
+        user_id = get_jwt_identity()
+        
+        # Total workouts
+        total_workouts = Workout.query.filter_by(user_id=user_id).count()
+        
+        # Workouts this week
+        today = datetime.utcnow()
+        start_of_week = today - timedelta(days=today.weekday())
+        start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        workouts_this_week = Workout.query.filter(
+            Workout.user_id == user_id,
+            Workout.created_at >= start_of_week
+        ).count()
+        
+        # Total stats
+        stats = db.session.query(
+            func.sum(Workout.duration_minutes),
+            func.sum(Workout.calories_burned)
+        ).filter_by(user_id=user_id, status='completed').first()
+        
+        total_minutes = int(stats[0]) if stats and stats[0] else 0
+        total_calories = int(stats[1]) if stats and stats[1] else 0
+        
+        return jsonify({
+            'total_workouts': total_workouts,
+            'workouts_this_week': workouts_this_week,
+            'total_minutes': total_minutes,
+            'total_calories': total_calories
+        }), 200
+        
+    except Exception as e:
         return jsonify({'error': str(e)}), 500

@@ -35,7 +35,7 @@ export class DashboardComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading profile:', error);
-        if (error.status === 401 || error.status === 0) {
+        if (error.status === 401 || error.status === 422 || error.status === 0) {
           this.authService.logout();
           this.router.navigate(['/login']);
         }
@@ -48,7 +48,7 @@ export class DashboardComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading statistics:', error);
-        if (error.status === 401 || error.status === 0) {
+        if (error.status === 401 || error.status === 422 || error.status === 0) {
           this.authService.logout();
           this.router.navigate(['/login']);
         }
@@ -63,7 +63,7 @@ export class DashboardComponent implements OnInit {
       error: (error) => {
         console.error('Error loading workouts:', error);
         this.loading = false;
-        if (error.status === 401 || error.status === 0) {
+        if (error.status === 401 || error.status === 422 || error.status === 0) {
           this.authService.logout();
           this.router.navigate(['/login']);
         }

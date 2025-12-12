@@ -39,18 +39,31 @@ class AICoachService:
         try:
             print("🧠 Initializing AI Coach Service...")
             
-            # Initialize all brains
+            # Initialize NLP Pipeline (Shared)
             self.nlp = NLPPipeline()
-            self.ml = NLPMLIntegration(self.nlp)
-            self.logic = NLPPrologIntegration(self.nlp)
-            self.personality = CoachPipeline()
+            
+            # Define paths
+            ml_model_path = os.path.join(AI_PATH, 'ml', 'models', 'saved_models', 'advanced_xgb_latest')
+            prolog_facts_dir = os.path.join(AI_PATH, 'prolog', 'facts', 'nlp')
+            
+            # Initialize Integrations with shared NLP pipeline and correct paths
+            self.ml = NLPMLIntegration(ml_model_path=ml_model_path, nlp_pipeline=self.nlp)
+            self.logic = NLPPrologIntegration(prolog_facts_dir=prolog_facts_dir, nlp_pipeline=self.nlp)
+            
+            # Initialize Personality (Coach Pipeline)
+            # Note: Passing brains to CoachPipeline to ensure it can generate responses
+            self.personality = CoachPipeline(
+                nlp_pipeline=self.nlp,
+                ml_integration=self.ml,
+                prolog_integration=self.logic
+            )
             
             # Create central controller
             self._controller = CentralController(
-                nlp_brain=self.nlp,
-                logic_brain=self.logic,
-                ml_brain=self.ml,
-                personality_brain=self.personality
+                nlp_pipeline=self.nlp,
+                prolog_integration=self.logic,
+                ml_integration=self.ml,
+                dialogue_pipeline=self.personality
             )
             
             self._initialized = True

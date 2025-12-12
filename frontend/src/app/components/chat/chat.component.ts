@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ChatService, ChatMessage } from '../../services/chat.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-chat',
@@ -14,7 +16,11 @@ export class ChatComponent implements OnInit {
   currentMessage: string = '';
   loading: boolean = false;
 
-  constructor(private chatService: ChatService) {}
+  constructor(
+    private chatService: ChatService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadChatHistory();
@@ -27,6 +33,10 @@ export class ChatComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading chat history:', error);
+        if (error.status === 401 || error.status === 422 || error.status === 0) {
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        }
       }
     });
   }
@@ -59,6 +69,10 @@ export class ChatComponent implements OnInit {
       error: (error) => {
         console.error('Error sending message:', error);
         this.loading = false;
+        if (error.status === 401 || error.status === 422 || error.status === 0) {
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        }
       }
     });
   }

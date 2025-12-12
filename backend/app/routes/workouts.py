@@ -10,7 +10,7 @@ from app.models import User, Workout
 bp = Blueprint('workouts', __name__)
 
 
-@bp.route('/', methods=['GET'])
+@bp.route('/', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def get_workouts():
     """Get user's workouts"""
@@ -35,7 +35,7 @@ def get_workouts():
         return jsonify({'error': str(e)}), 500
 
 
-@bp.route('/', methods=['POST'])
+@bp.route('/', methods=['POST'], strict_slashes=False)
 @jwt_required()
 def create_workout():
     """Create a new workout"""
